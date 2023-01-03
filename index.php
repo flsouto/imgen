@@ -7,7 +7,7 @@ foreach($dirs as &$dir){
     $dir = str_replace(__DIR__."/","",$dir);
 }
 
-$d = $_REQUEST['d'] ?? null;
+$d = $_REQUEST['d'] ?? '';
 $is_tmp = strstr($d,'tmp/');
 ?>
 
@@ -23,14 +23,20 @@ $is_tmp = strstr($d,'tmp/');
         $dims = $m[0];
         $i = $_REQUEST['i'] ?? 0;
         $save_to = $_REQUEST['save_to'] ?? 'db, new';
-        $copy_to = $_REQUEST['save_to'] ?? '';
+        $copy_to = $_REQUEST['copy_to'] ?? '';
 
         switch($_REQUEST['a']??''){
             case 'forward' :
                 $i++;
+                if(!isset($imgs[$i])){
+                    $i = 0;
+                }
             break;
             case 'back' :
                 $i--;
+                if($i < 0){
+                    $i = count($imgs)-1;
+                }
             break;
             case 'copy' :
                 foreach(explode(",", $copy_to) as $to_dir){
@@ -67,22 +73,35 @@ $is_tmp = strstr($d,'tmp/');
     <b>Browsing <?php echo $d; ?></b>
     <form style="margin:0" action="?" method="GET" id="action-form">
         <?php if($is_tmp) : ?>
-            Save to: <input name="save_to" value="<?php echo $save_to; ?>" style="width:120px" /> &nbsp; 
+            Save to: <input name="save_to" value="<?php echo $save_to; ?>" style="width:120px" 
+                onfocus="blocked = true"
+                onblur="blocked = false"
+            /> &nbsp;
         <?php endif; ?>
         <?php if(!$is_tmp) : ?>
-            Copy to: <input name="copy_to" style="width:120px;" />
+            Copy to: <input name="copy_to" value="<?php echo $copy_to; ?>" style="width:120px" 
+                onfocus="blocked = true"
+                onblur="blocked = false"
+             />
         <?php endif; ?>
         <input type=hidden name=a value="" />
         <input type=hidden name=i value=<?php echo $i ?> />
         <input type=hidden name=d value=<?php echo $d ?> />
     </form>
     <?php echo $i+1; ?> of <?php echo count($imgs); ?>
-    &nbsp; [s]ave [d]elete [c]opy [f]orward [b]ackward
+    &nbsp;
+    <?php if($is_tmp) : ?>[s]ave<?php endif; ?>
+    [d]elete <?php if(!$is_tmp) : ?>
+    [c]opy <?php endif; ?>
+    [f]orward
+    [b]ackward
     <br/>
     <input value="<?php echo __DIR__."/".$img; ?>" onfocus="this.select()" style="border:none;width:700px;" /><br/>
     <img src="<?php echo $img ?>" style="width:480px" />
     <script>
+        window.blocked = false;
         document.onkeydown = e => {
+            if(blocked) return;
             const code2action = {
                 <?php if($is_tmp) : ?>
                 83 : 'save',
