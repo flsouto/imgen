@@ -22,7 +22,7 @@ $is_tmp = strstr($d,'tmp/');
         preg_match("/(\d+)x(\d+)/",$d, $m);
         $dims = $m[0];
         $i = $_REQUEST['i'] ?? 0;
-        $save_to = $_REQUEST['save_to'] ?? 'db, new';
+        $save_to = $_REQUEST['save_to'] ?? 'db, '.date('Y-m-d');
         $copy_to = $_REQUEST['copy_to'] ?? '';
 
         switch($_REQUEST['a']??''){

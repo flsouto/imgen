@@ -67,7 +67,8 @@ for($i=1;$i<=$amount;$i++){
 
     $a->sfactor('2x2,1x1,1x1');
     if(implode('x',$a->size()) != $dims_str){
-        die('dimensions failed');
+        echo "dimensions failed\n";
+        continue;
     }
     $hash = $a->hash();
     $img = "$out_dir/$hash.jpg";
